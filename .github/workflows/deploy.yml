@@ -20,15 +20,19 @@ jobs:
 
     - name: Initialize Terraform
       run: terraform init
+      working-directory: infra
 
     - name: Validate Terraform
       run: terraform validate
+      working-directory: infra
 
     - name: Plan Terraform
       run: terraform plan
+      working-directory: infra
 
     - name: Apply Terraform
       run: terraform apply -auto-approve
+      working-directory: infra
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
