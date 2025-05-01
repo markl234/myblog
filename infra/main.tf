@@ -36,6 +36,11 @@ variable "location" {
   default     = "uksouth"
 }
 
+variable "wordpress_db_password" {
+  description = "The WordPress database password"
+  type        = string
+}
+
 provider "azurerm" {
   features {}
   subscription_id = var.subscription_id
@@ -173,7 +178,7 @@ resource "azurerm_container_app" "main" {
       }
       env {
         name  = "WORDPRESS_DB_PASSWORD"
-        value = "${{ secrets.WORDPRESS_DB_PASSWORD }}"
+        value = var.wordpress_db_password
       }
       env {
         name  = "WORDPRESS_DB_NAME"
