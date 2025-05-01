@@ -1,5 +1,14 @@
 # Blog Infra: Terraform configuration for Azure Container Apps, MySQL, and Storage
 
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.64"
+    }
+  }
+}
+
 variable "subscription_id" {
   description = "The Azure subscription ID"
   type        = string
@@ -32,7 +41,6 @@ provider "azurerm" {
   client_id       = var.client_id
   client_secret   = var.client_secret
   tenant_id       = var.tenant_id
-  version         = "~> 3.64"
 }
 
 resource "azurerm_resource_group" "main" {
@@ -83,16 +91,10 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "main" {
   object_id   = azurerm_user_assigned_identity.main.principal_id
 }
 
-resource "azurerm_container_app_managed_environment" "main" {
-  name                = "wordpress-managed-env-${random_string.suffix.result}"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = var.location
-}
-
 resource "azurerm_container_app" "main" {
   name                = "wordpress-container-app-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
-  container_app_environment_id = azurerm_container_app_managed_environment.main.id
+  container_app_environment_id = null
   revision_mode       = "Single"
 
   identity {
