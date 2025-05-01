@@ -118,16 +118,16 @@ resource "azurerm_subnet" "main" {
   }
 }
 
-resource "azurerm_app_service_environment_v3" "main" {
+resource "azurerm_container_app_environment" "main" {
   name                = "wordpress-env-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
-  subnet_id           = azurerm_subnet.main.id
+  location            = var.location
 }
 
 resource "azurerm_container_app" "main" {
   name                = "wordpress-container-app-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
-  container_app_environment_id = azurerm_app_service_environment_v3.main.id
+  container_app_environment_id = azurerm_container_app_environment.main.id
   revision_mode       = "Single"
 
   identity {
