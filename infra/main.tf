@@ -53,7 +53,7 @@ resource "azurerm_container_app" "main" {
       }
       env {
         name  = "WORDPRESS_DB_NAME"
-        value = azurerm_mysql_flexible_server_database.main.name
+        value = "wordpressdb"
       }
     }
   }
