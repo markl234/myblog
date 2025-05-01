@@ -132,7 +132,8 @@ resource "azurerm_container_app" "main" {
   revision_mode       = "Single"
 
   identity {
-    type = "UserAssigned"
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.main.id]
   }
 
   template {
