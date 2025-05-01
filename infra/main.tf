@@ -162,3 +162,9 @@ resource "azurerm_container_app" "main" {
     }
   }
 }
+
+resource "azurerm_role_assignment" "acr_pull" {
+  principal_id   = azurerm_user_assigned_identity.main.principal_id
+  role_definition_name = "AcrPull"
+  scope          = azurerm_container_registry.main.id
+}
