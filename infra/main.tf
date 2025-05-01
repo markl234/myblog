@@ -82,10 +82,16 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "main" {
   object_id   = azurerm_user_assigned_identity.main.principal_id
 }
 
+resource "azurerm_container_app_managed_environment" "main" {
+  name                = "wordpress-managed-env-${random_string.suffix.result}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = var.location
+}
+
 resource "azurerm_container_app" "main" {
   name                = "wordpress-container-app-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
-  container_app_environment_id = azurerm_container_registry.main.id
+  container_app_environment_id = azurerm_container_app_managed_environment.main.id
   revision_mode       = "Single"
 
   identity {
