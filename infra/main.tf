@@ -20,6 +20,12 @@ variable "tenant_id" {
   type        = string
 }
 
+variable "location" {
+  description = "The Azure region to deploy resources"
+  type        = string
+  default     = "uksouth"
+}
+
 provider "azurerm" {
   features {}
   subscription_id = var.subscription_id
@@ -30,20 +36,26 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "main" {
   name     = "wordpress-rg"
-  location = "eastus"
+  location = var.location
 }
 
 resource "azurerm_container_registry" "main" {
-  name                = "wordpressacr"
+  name                = "wordpressacr-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku                 = "Basic"
 }
 
+resource "random_string" "suffix" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
 resource "azurerm_mysql_flexible_server" "main" {
-  name                = "wordpress-mysql"
+  name                = "wordpress-mysql-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  location            = var.location
   administrator_login = "adminuser"
   administrator_password = "P@ssw0rd123!"
   sku_name            = "B_Standard_B1ms"
@@ -51,7 +63,7 @@ resource "azurerm_mysql_flexible_server" "main" {
 }
 
 resource "azurerm_container_app" "main" {
-  name                = "wordpress-container-app"
+  name                = "wordpress-container-app-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
   container_app_environment_id = azurerm_container_registry.main.id
   revision_mode       = "Single"
