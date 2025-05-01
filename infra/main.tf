@@ -23,7 +23,7 @@ resource "azurerm_mysql_flexible_server" "main" {
   administrator_login = "adminuser"
   administrator_password = "P@ssw0rd123!"
   sku_name            = "B_Standard_B1ms"
-  version             = "8.0"
+  version             = "8.0.21"
 }
 
 resource "azurerm_container_app" "main" {
