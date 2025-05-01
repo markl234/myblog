@@ -1,4 +1,8 @@
-# Blog Infra: Terraform configuration for Azure Container Apps, MySQL, and Storage
+# Blog Deploy Infrostructure
+# This script deploys a WordPress application using Azure Container Apps, MySQL, and Storage.
+
+git commit -m "Replace App Service Environment with Container App Environment"
+git push origin main: Terraform configuration for Azure Container Apps, MySQL, and Storage
 
 terraform {
   required_providers {
