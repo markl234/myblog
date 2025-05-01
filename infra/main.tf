@@ -29,7 +29,6 @@ resource "azurerm_mysql_flexible_server" "main" {
 resource "azurerm_container_app" "main" {
   name                = "wordpress-container-app"
   resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
   container_app_environment_id = azurerm_container_registry.main.id
   revision_mode       = "Single"
 
