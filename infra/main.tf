@@ -1,4 +1,4 @@
-# Terraform configuration for Azure Container Apps, MySQL, and Storage
+# Blog Infra: Terraform configuration for Azure Container Apps, MySQL, and Storage
 
 variable "subscription_id" {
   description = "The Azure subscription ID"
