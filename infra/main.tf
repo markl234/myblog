@@ -70,18 +70,15 @@ resource "azurerm_mysql_flexible_server" "main" {
 
   identity {
     type = "UserAssigned"
-    user_assigned_identities = {
-      azurerm_user_assigned_identity.main.id = {}
-    }
+    identity_ids = [azurerm_user_assigned_identity.main.id]
   }
 }
 
 resource "azurerm_mysql_flexible_server_active_directory_administrator" "main" {
-  server_name         = azurerm_mysql_flexible_server.main.name
-  resource_group_name = azurerm_resource_group.main.name
-  login               = "wordpressadmin"
-  tenant_id           = var.tenant_id
-  object_id           = azurerm_user_assigned_identity.main.principal_id
+  server_id   = azurerm_mysql_flexible_server.main.id
+  identity_id = azurerm_user_assigned_identity.main.id
+  login       = "wordpressadmin"
+  tenant_id   = var.tenant_id
 }
 
 resource "azurerm_container_app" "main" {
