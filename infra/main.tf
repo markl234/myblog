@@ -45,7 +45,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "wordpress-rg"
+  name     = "mjlblog-rg"
   location = var.location
 }
 
@@ -164,7 +164,7 @@ resource "azurerm_container_app" "main" {
 }
 
 resource "azurerm_role_assignment" "acr_pull" {
-  principal_id   = azurerm_user_assigned_identity.main.principal_id
+  principal_id         = azurerm_container_app.main.identity[0].principal_id
   role_definition_name = "AcrPull"
-  scope          = azurerm_container_registry.main.id
+  scope                = azurerm_container_registry.main.id
 }
