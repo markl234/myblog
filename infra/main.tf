@@ -95,7 +95,7 @@ resource "azurerm_key_vault_access_policy" "main" {
   tenant_id = var.tenant_id
   object_id = azurerm_user_assigned_identity.main.principal_id
 
-  secret_permissions = ["get", "list"]
+  secret_permissions = ["Get", "List"]
 }
 
 resource "random_password" "mysql_admin" {
