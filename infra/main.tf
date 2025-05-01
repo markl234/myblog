@@ -109,7 +109,6 @@ resource "azurerm_subnet" "main" {
 resource "azurerm_app_service_environment_v3" "main" {
   name                = "wordpress-env-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
-  location            = var.location
   subnet_id           = azurerm_subnet.main.id
 }
 
