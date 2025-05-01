@@ -104,6 +104,18 @@ resource "azurerm_subnet" "main" {
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
+
+  delegation {
+    name = "MicrosoftWebHostingEnvironments"
+
+    service_delegation {
+      name = "Microsoft.Web/hostingEnvironments"
+
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/action"
+      ]
+    }
+  }
 }
 
 resource "azurerm_app_service_environment_v3" "main" {
