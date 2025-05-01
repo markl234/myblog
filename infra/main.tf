@@ -40,7 +40,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 resource "azurerm_container_registry" "main" {
-  name                = "wordpressacr-${random_string.suffix.result}"
+  name                = "wordpressacr${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku                 = "Basic"
@@ -50,6 +50,13 @@ resource "random_string" "suffix" {
   length  = 6
   special = false
   upper   = false
+  numeric = true
+}
+
+resource "azurerm_user_assigned_identity" "main" {
+  name                = "wordpress-identity-${random_string.suffix.result}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = var.location
 }
 
 resource "azurerm_mysql_flexible_server" "main" {
@@ -60,6 +67,21 @@ resource "azurerm_mysql_flexible_server" "main" {
   administrator_password = "P@ssw0rd123!"
   sku_name            = "B_Standard_B1ms"
   version             = "8.0.21"
+
+  identity {
+    type = "UserAssigned"
+    user_assigned_identities = {
+      azurerm_user_assigned_identity.main.id = {}
+    }
+  }
+}
+
+resource "azurerm_mysql_flexible_server_active_directory_administrator" "main" {
+  server_name         = azurerm_mysql_flexible_server.main.name
+  resource_group_name = azurerm_resource_group.main.name
+  login               = "wordpressadmin"
+  tenant_id           = var.tenant_id
+  object_id           = azurerm_user_assigned_identity.main.principal_id
 }
 
 resource "azurerm_container_app" "main" {
@@ -67,6 +89,13 @@ resource "azurerm_container_app" "main" {
   resource_group_name = azurerm_resource_group.main.name
   container_app_environment_id = azurerm_container_registry.main.id
   revision_mode       = "Single"
+
+  identity {
+    type = "UserAssigned"
+    user_assigned_identities = {
+      azurerm_user_assigned_identity.main.id = {}
+    }
+  }
 
   template {
     container {
@@ -81,11 +110,11 @@ resource "azurerm_container_app" "main" {
       }
       env {
         name  = "WORDPRESS_DB_USER"
-        value = azurerm_mysql_flexible_server.main.administrator_login
+        value = "wordpressadmin"
       }
       env {
         name  = "WORDPRESS_DB_PASSWORD"
-        value = azurerm_mysql_flexible_server.main.administrator_password
+        value = null
       }
       env {
         name  = "WORDPRESS_DB_NAME"
