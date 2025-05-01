@@ -45,7 +45,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "mjlblog-rg"
+  name     = "mlblog-rg"
   location = var.location
 }
 
@@ -54,6 +54,7 @@ resource "azurerm_container_registry" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
   sku                 = "Basic"
+  admin_enabled       = true
 }
 
 resource "random_string" "suffix" {
@@ -69,12 +70,30 @@ resource "azurerm_user_assigned_identity" "main" {
   location            = var.location
 }
 
+resource "azurerm_key_vault" "main" {
+  name                = "wordpress-kv-${random_string.suffix.result}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku_name            = "standard"
+}
+
+resource "azurerm_key_vault_secret" "mysql_admin_password" {
+  name         = "mysql-admin-password"
+  value        = random_password.mysql_admin.result
+  key_vault_id = azurerm_key_vault.main.id
+}
+
+resource "random_password" "mysql_admin" {
+  length  = 16
+  special = true
+}
+
 resource "azurerm_mysql_flexible_server" "main" {
   name                = "wordpress-mysql-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
   location            = var.location
   administrator_login = "adminuser"
-  administrator_password = "P@ssw0rd123!"
+  administrator_password = azurerm_key_vault_secret.mysql_admin_password.value
   sku_name            = "B_Standard_B1ms"
   version             = "8.0.21"
 
@@ -167,4 +186,5 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = azurerm_container_app.main.identity[0].principal_id
   role_definition_name = "AcrPull"
   scope                = azurerm_container_registry.main.id
+  depends_on           = [azurerm_container_registry.main]
 }
