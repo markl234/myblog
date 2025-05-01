@@ -79,6 +79,7 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "main" {
   identity_id = azurerm_user_assigned_identity.main.id
   login       = "wordpressadmin"
   tenant_id   = var.tenant_id
+  object_id   = azurerm_user_assigned_identity.main.principal_id
 }
 
 resource "azurerm_container_app" "main" {
@@ -89,9 +90,6 @@ resource "azurerm_container_app" "main" {
 
   identity {
     type = "UserAssigned"
-    user_assigned_identities = {
-      azurerm_user_assigned_identity.main.id = {}
-    }
   }
 
   template {
