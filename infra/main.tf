@@ -23,14 +23,8 @@ resource "azurerm_mysql_flexible_server" "main" {
   administrator_login = "adminuser"
   administrator_password = "P@ssw0rd123!"
   sku_name            = "B_Standard_B1ms"
-  storage_size_gb     = 5
+  storage_mb          = 5120
   version             = "8.0"
-}
-
-resource "azurerm_mysql_flexible_server_database" "main" {
-  name                = "wordpressdb"
-  resource_group_name = azurerm_resource_group.main.name
-  server_name         = azurerm_mysql_flexible_server.main.name
 }
 
 resource "azurerm_container_app" "main" {
