@@ -4,7 +4,7 @@ param containerAppName string = 'wordpress-container-app'
 param mysqlServerName string = 'wordpress-mysql-server'
 param mysqlDatabaseName string = 'wordpressdb'
 param mysqlAdminUsername string = 'adminuser'
-param mysqlAdminPassword string = 'P@ssw0rd123!'
+param mysqlAdminPassword string = 'xxx'
 
 resource containerApp 'Microsoft.App/containerApps@2023-03-01' = {
   name: containerAppName
