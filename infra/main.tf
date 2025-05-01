@@ -98,6 +98,13 @@ resource "azurerm_key_vault_access_policy" "main" {
   secret_permissions = ["Get", "List"]
 }
 
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+  depends_on = [azurerm_key_vault_access_policy.main]
+}
+
 resource "random_password" "mysql_admin" {
   length  = 16
   special = true
