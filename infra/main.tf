@@ -75,6 +75,7 @@ resource "azurerm_key_vault" "main" {
   location            = var.location
   resource_group_name = azurerm_resource_group.main.name
   sku_name            = "standard"
+  tenant_id           = var.tenant_id
 }
 
 resource "azurerm_key_vault_secret" "mysql_admin_password" {
@@ -172,7 +173,7 @@ resource "azurerm_container_app" "main" {
       }
       env {
         name  = "WORDPRESS_DB_PASSWORD"
-        value = null
+        value = "${{ secrets.WORDPRESS_DB_PASSWORD }}"
       }
       env {
         name  = "WORDPRESS_DB_NAME"
