@@ -194,3 +194,9 @@ resource "azurerm_role_assignment" "acr_pull" {
   scope                = azurerm_container_registry.main.id
   depends_on           = [azurerm_container_registry.main]
 }
+
+resource "azurerm_role_assignment" "key_vault_secrets_user" {
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+  role_definition_name = "Key Vault Secrets User"
+  scope                = azurerm_key_vault.main.id
+}
