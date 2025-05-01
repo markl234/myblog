@@ -91,10 +91,26 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "main" {
   object_id   = azurerm_user_assigned_identity.main.principal_id
 }
 
+resource "azurerm_virtual_network" "main" {
+  name                = "wordpress-vnet-${random_string.suffix.result}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  address_space = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "main" {
+  name                 = "wordpress-subnet-${random_string.suffix.result}"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
 resource "azurerm_app_service_environment_v3" "main" {
   name                = "wordpress-env-${random_string.suffix.result}"
   resource_group_name = azurerm_resource_group.main.name
   location            = var.location
+  subnet_id           = azurerm_subnet.main.id
 }
 
 resource "azurerm_container_app" "main" {
