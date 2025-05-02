@@ -234,16 +234,16 @@ resource "azurerm_container_app" "main" {
 
   # ACR details needed for the container app to pull images
   registry {
-    server               = azurerm_container_registry.main.login_server
-    identity             = azurerm_user_assigned_identity.main.id # Use managed identity to pull from ACR
+    server   = azurerm_container_registry.main.login_server
+    identity = azurerm_user_assigned_identity.main.id # Use managed identity to pull from ACR
   }
 
   template {
     container {
       name   = "wordpress"
       image  = "${azurerm_container_registry.main.login_server}/wordpress:latest" # Ensure this image exists in your ACR
-      cpu    = 0.5 # Corrected format
-      memory = "1.0Gi" # Corrected format
+      cpu    = 0.5
+      memory = "1.0Gi"
 
       env {
         name  = "WORDPRESS_DB_HOST"
@@ -251,20 +251,11 @@ resource "azurerm_container_app" "main" {
       }
       env {
         name  = "WORDPRESS_DB_USER"
-        # IMPORTANT: This user needs to exist in the MySQL database with appropriate permissions.
-        # If using AAD auth, this might need adjustment based on how the AAD user maps in MySQL.
-        # The azurerm_mysql_flexible_server_active_directory_administrator creates an AAD admin,
-        # but standard application users might need separate creation/permissions.
-        # Consider if 'wordpressadmin' AAD user can directly be used or if a separate SQL user is better.
         value = "wordpressadmin"
       }
       env {
-        name      = "WORDPRESS_DB_PASSWORD"
-        # Use the variable directly, assuming it's provided securely during apply
-        # Or retrieve from Key Vault if preferred (requires Container App identity having KV secret read permissions)
-        value     = var.wordpress_db_password
-        # Example using Key Vault secret (requires KV permissions for Container App's Managed Identity):
-        # secret_name = azurerm_key_vault_secret.wordpress_db_password.name # Assuming you create a KV secret for WP password
+        name  = "WORDPRESS_DB_PASSWORD"
+        value = var.wordpress_db_password
       }
       env {
         name  = "WORDPRESS_DB_NAME"
@@ -278,10 +269,16 @@ resource "azurerm_container_app" "main" {
     external_enabled = true
     target_port      = 80 # Default WordPress port
     transport        = "http"
+
+    # <-- ADDED: Traffic weight definition -->
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
+    }
   }
 
   depends_on = [
-    azurerm_role_assignment.acr_pull, # Ensure ACR pull role is assigned first
+    azurerm_role_assignment.acr_pull,
     # azurerm_mysql_flexible_database.main # Depend on DB creation if managed by Terraform
   ]
 }
