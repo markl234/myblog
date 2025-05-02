@@ -50,7 +50,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "mlblog-rg"
+  name     = "mjlblog-rg"
   location = var.location
 }
 
