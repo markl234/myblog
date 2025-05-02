@@ -76,11 +76,13 @@ resource "azurerm_user_assigned_identity" "main" {
 }
 
 resource "azurerm_key_vault" "main" {
-  name                = "wordpress-kv-${random_string.suffix.result}"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.main.name
-  sku_name            = "standard"
-  tenant_id           = var.tenant_id
+  name                     = "wordpress-kv-${random_string.suffix.result}"
+  location                 = var.location
+  resource_group_name      = azurerm_resource_group.main.name
+  sku_name                 = "standard"
+  tenant_id                = var.tenant_id
+  purge_protection_enabled = true
+  enable_rbac_authorization = true
 }
 
 resource "azurerm_key_vault_secret" "mysql_admin_password" {
