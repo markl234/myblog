@@ -50,7 +50,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "mjlblog-rg"
+  name     = "mlblog-rg"
   location = var.location
 }
 
@@ -93,7 +93,7 @@ resource "null_resource" "delay" {
   provisioner "local-exec" {
     command = "sleep 60"
   }
-  depends_on = [azurerm_role_assignment.key_vault_secrets_user]
+  depends_on = [azurerm_role_assignment.key_vault_secrets_officer]
 }
 
 resource "random_password" "mysql_admin" {
@@ -202,8 +202,8 @@ resource "azurerm_role_assignment" "acr_pull" {
   depends_on           = [azurerm_container_registry.main]
 }
 
-resource "azurerm_role_assignment" "key_vault_secrets_user" {
+resource "azurerm_role_assignment" "key_vault_secrets_officer" {
   principal_id         = azurerm_user_assigned_identity.main.principal_id
-  role_definition_name = "Key Vault Secrets User"
+  role_definition_name = "Key Vault Secrets Officer"
   scope                = azurerm_key_vault.main.id
 }
