@@ -55,7 +55,7 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "main" {
-  name     = "mjlblog-rg"
+  name     = "mlblog-rg"
   location = var.location
 }
 
@@ -232,16 +232,17 @@ resource "azurerm_container_app" "main" {
     identity_ids = [azurerm_user_assigned_identity.main.id]
   }
 
-  # ACR details needed for the container app to pull images
+  # ACR details - still useful if you add other containers using your private ACR later
   registry {
     server   = azurerm_container_registry.main.login_server
-    identity = azurerm_user_assigned_identity.main.id # Use managed identity to pull from ACR
+    identity = azurerm_user_assigned_identity.main.id
   }
 
   template {
     container {
       name   = "wordpress"
-      image  = "${azurerm_container_registry.main.login_server}/wordpress:latest" # Ensure this image exists in your ACR
+      # <-- UPDATED: Use the official public image -->
+      image  = "docker.io/library/wordpress:latest"
       cpu    = 0.5
       memory = "1.0Gi"
 
@@ -264,13 +265,10 @@ resource "azurerm_container_app" "main" {
     }
   }
 
-  # Add ingress if you want the app to be accessible externally
   ingress {
     external_enabled = true
-    target_port      = 80 # Default WordPress port
+    target_port      = 80
     transport        = "http"
-
-    # <-- ADDED: Traffic weight definition -->
     traffic_weight {
       percentage      = 100
       latest_revision = true
@@ -279,7 +277,7 @@ resource "azurerm_container_app" "main" {
 
   depends_on = [
     azurerm_role_assignment.acr_pull,
-    # azurerm_mysql_flexible_database.main # Depend on DB creation if managed by Terraform
+    # azurerm_mysql_flexible_database.main
   ]
 }
 
