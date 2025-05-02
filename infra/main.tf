@@ -89,20 +89,11 @@ resource "azurerm_key_vault_secret" "mysql_admin_password" {
   key_vault_id = azurerm_key_vault.main.id
 }
 
-resource "azurerm_key_vault_access_policy" "main" {
-  key_vault_id = azurerm_key_vault.main.id
-
-  tenant_id = var.tenant_id
-  object_id = azurerm_user_assigned_identity.main.principal_id
-
-  secret_permissions = ["Get", "List"]
-}
-
 resource "null_resource" "delay" {
   provisioner "local-exec" {
     command = "sleep 60"
   }
-  depends_on = [azurerm_key_vault_access_policy.main]
+  depends_on = [azurerm_role_assignment.key_vault_secrets_user]
 }
 
 resource "random_password" "mysql_admin" {
