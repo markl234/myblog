@@ -1,4 +1,4 @@
-# Blog Deploy Infrastructure
+# Blog Deploy Infrastructure using Gemini
 # This script deploys a WordPress application using Azure Container Apps, MySQL, and Storage.
 
 terraform {
